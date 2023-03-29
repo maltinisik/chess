@@ -1,7 +1,5 @@
 package com.chess.engine.player.ai;
 
-import java.util.Iterator;
-
 import com.chess.engine.board.Board;
 import com.chess.engine.pieces.Piece;
 import com.chess.engine.player.Player;
@@ -10,8 +8,9 @@ public final class StandartBoardEvaluator implements BoardEvaluator {
 
 	private static final int CHECK_BONUS = 1;
 	private static final int CHECK_MATE_BONUS = 10000;
-	private static final int DEPTH_BONUS = 100;
+	private static final int DEPTH_BONUS = 10;
 	private static final int CASTLED_BONUS = 60;
+	private static final int MAX_DEPTH = 10;
 
 	@Override
 	public int evaluate(final Board board, final int depth) {
@@ -36,7 +35,7 @@ public final class StandartBoardEvaluator implements BoardEvaluator {
 	}
 
 	private static int depthBonus(int depth) {
-		return depth == 0 ? 1 : depth * DEPTH_BONUS;
+		return (MAX_DEPTH-depth) * DEPTH_BONUS;
 	}
 
 	private int check(Player player) {

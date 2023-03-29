@@ -22,8 +22,8 @@ public class JChess {
 	}
 
 	private static void method0() {
-		Board board = Board.createStandardBoard();
-		System.out.println(board.toString());
+		//Board board = Board.createStandardBoard();
+		//System.out.println(board.toString());
 		
 		Table.get().show();
 		
