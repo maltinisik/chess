@@ -1,59 +1,76 @@
 package com.chess.engine.player.ai;
 
 import com.chess.engine.board.Board;
-import com.chess.engine.pieces.Piece;
 import com.chess.engine.player.Player;
+import com.google.common.annotations.VisibleForTesting;
 
-public final class StandartBoardEvaluator implements BoardEvaluator {
+public final class StandartBoardEvaluator
+        implements BoardEvaluator {
 
-	private static final int CHECK_BONUS = 1;
-	private static final int CHECK_MATE_BONUS = 10000;
-	private static final int DEPTH_BONUS = 10;
-	private static final int CASTLED_BONUS = 60;
-	private static final int MAX_DEPTH = 10;
+    private final static int CHECK_MATE_BONUS = 10000;
+    private final static int CHECK_BONUS = 45;
+    private final static int CASTLE_BONUS = 25;
+    private final static int MOBILITY_MULTIPLIER = 5;
+    private final static int ATTACK_MULTIPLIER = 1;
+    private final static int TWO_BISHOPS_BONUS = 25;
+    private static final StandartBoardEvaluator INSTANCE = new StandartBoardEvaluator();
 
-	@Override
-	public int evaluate(final Board board, final int depth) {
-		return scorePlayer(board, board.getWhitePlayer(),depth)-
-			   scorePlayer(board, board.getBlackPlayer(),depth);
-	}
+    private StandartBoardEvaluator() {
+    }
 
-	private int scorePlayer(final Board board, final Player player, final int depth) {
-		return pieceValue(player) + 
-			   mobility(player) + 
-			   check(player) + 
-			   checkMate(player,depth) + 
-			   castled(player);
-	}
+    public static StandartBoardEvaluator get() {
+        return INSTANCE;
+    }
 
-	private static int castled(Player player) {
-		return player.isCastled() ? CASTLED_BONUS : 0 ;
-	}
+    @Override
+    public int evaluate(final Board board,
+                        final int depth) {
+        return score(board.getWhitePlayer(), depth) - score(board.getBlackPlayer(), depth);
+    }
 
-	private int checkMate(Player player, final int depth) {
-		return player.getOpponent().isInCheckMate() ? CHECK_MATE_BONUS * depthBonus(depth) : 0;
-	}
+    public String evaluationDetails(final Board board, final int depth) {
+        return
+               ("White Mobility : " + mobility(board.getWhitePlayer()) + "\n") +
+                "White kingThreats : " + kingThreats(board.getWhitePlayer(), depth) + "\n" +
+                "White castle : " + castle(board.getWhitePlayer()) + "\n" +
+                "---------------------\n" +
+                "Black Mobility : " + mobility(board.getBlackPlayer()) + "\n" +
+                "Black kingThreats : " + kingThreats(board.getBlackPlayer(), depth) + "\n" +
+                "Black castle : " + castle(board.getBlackPlayer()) + "\n" +
+                "Final Score = " + evaluate(board, depth);
+    }
 
-	private static int depthBonus(int depth) {
-		return (MAX_DEPTH-depth) * DEPTH_BONUS;
-	}
+    @VisibleForTesting
+    private static int score(final Player player,
+                             final int depth) {
+        return mobility(player) +
+               kingThreats(player, depth) +
+               castle(player);
+    }
 
-	private int check(Player player) {
-		return player.getOpponent().isInCheck() ? CHECK_BONUS : 0;
-	}
+    private static int mobility(final Player player) {
+        return MOBILITY_MULTIPLIER * mobilityRatio(player);
+    }
 
-	private int mobility(Player player) {
-		return player.getLegalMoves().size();
-	}
+    private static int mobilityRatio(final Player player) {
+        return (int)((player.getLegalMoves().size() * 10.0f) / player.getOpponent().getLegalMoves().size());
+    }
 
-	private int pieceValue(Player player) {
-		
-		int pieceValueScore = 0;
-		for (final Piece piece : player.getActivePieces()) {
-			pieceValueScore += piece.getPieceValue();
-		}
-		
-		return pieceValueScore;
-	}
+    private static int kingThreats(final Player player,
+                                   final int depth) {
+        return player.getOpponent().isInCheckMate() ? CHECK_MATE_BONUS  * depthBonus(depth) : check(player);
+    }
+
+    private static int check(final Player player) {
+        return player.getOpponent().isInCheck() ? CHECK_BONUS : 0;
+    }
+
+    private static int depthBonus(final int depth) {
+        return depth == 0 ? 1 : 100 * depth;
+    }
+
+    private static int castle(final Player player) {
+        return player.isCastled() ? CASTLE_BONUS : 0;
+    }
 
 }
