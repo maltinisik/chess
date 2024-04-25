@@ -16,9 +16,9 @@ public class JChess {
 		
        //method1();
        
-		//method_o_o();
+	   //method_o_o();
 		
-		//method_o_o_o();
+	   //method_o_o_o();
 	}
 
 	private static void method0() {
@@ -26,7 +26,6 @@ public class JChess {
 		//System.out.println(board.toString());
 		
 		Table.get().show();
-		
 	}
 
 	private static void method_o_o_o() {

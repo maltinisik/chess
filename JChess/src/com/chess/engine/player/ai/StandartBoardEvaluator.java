@@ -1,6 +1,8 @@
 package com.chess.engine.player.ai;
 
 import com.chess.engine.board.Board;
+import com.chess.engine.pieces.Piece;
+import com.chess.engine.pieces.Piece.PieceType;
 import com.chess.engine.player.Player;
 import com.google.common.annotations.VisibleForTesting;
 
@@ -14,6 +16,7 @@ public final class StandartBoardEvaluator
     private final static int ATTACK_MULTIPLIER = 1;
     private final static int TWO_BISHOPS_BONUS = 25;
     private static final StandartBoardEvaluator INSTANCE = new StandartBoardEvaluator();
+	private static final PieceType BISHOP = Piece.PieceType.BISHOP;
 
     private StandartBoardEvaluator() {
     }
@@ -45,10 +48,23 @@ public final class StandartBoardEvaluator
                              final int depth) {
         return mobility(player) +
                kingThreats(player, depth) +
-               castle(player);
+               castle(player) +
+               pieceEvaluations(player);
     }
 
-    private static int mobility(final Player player) {
+    private static int pieceEvaluations(final Player player) {
+        int pieceValuationScore = 0;
+        int numBishops = 0;
+        for (final Piece piece : player.getActivePieces()) {
+            pieceValuationScore += piece.getPieceValue(); // + piece.locationBonus();
+            if(piece.getPieceType() == BISHOP) {
+                numBishops++;
+            }
+        }
+        return pieceValuationScore + (numBishops == 2 ? TWO_BISHOPS_BONUS : 0);
+    }
+
+	private static int mobility(final Player player) {
         return MOBILITY_MULTIPLIER * mobilityRatio(player);
     }
 
