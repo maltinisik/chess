@@ -11,7 +11,7 @@ public final class StandartBoardEvaluator
 
     private final static int CHECK_MATE_BONUS = 10000;
     private final static int CHECK_BONUS = 45;
-    private final static int CASTLE_BONUS = 25;
+    private final static int CASTLE_BONUS = 40;
     private final static int MOBILITY_MULTIPLIER = 5;
     private final static int ATTACK_MULTIPLIER = 1;
     private final static int TWO_BISHOPS_BONUS = 25;

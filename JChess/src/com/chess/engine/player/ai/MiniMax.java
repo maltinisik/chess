@@ -1,8 +1,14 @@
 package com.chess.engine.player.ai;
 
+import java.util.Collection;
+import java.util.Comparator;
+
 import com.chess.engine.board.Board;
+import com.chess.engine.board.BoardUtils;
 import com.chess.engine.board.Move;
 import com.chess.engine.player.MoveTransition;
+import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.Ordering;
 
 public class MiniMax implements MoveStrategy {
 
@@ -17,6 +23,29 @@ public class MiniMax implements MoveStrategy {
 	@Override
 	public String toString() {
 		return "MiniMax";
+	}
+
+	private enum MoveSorter {
+		SORT {
+			@Override
+			Collection<Move> sort(Collection<Move> moves) {
+				return Ordering.from(SMART_SORT).immutableSortedCopy(moves);
+			}
+		};
+
+        public static Comparator<Move> SMART_SORT = new Comparator<Move>() {
+            @Override
+            public int compare(final Move move1, final Move move2) {
+                return ComparisonChain.start()
+                        .compareTrueFirst(BoardUtils.isThreatenedBoardImmediate(move1.getBoard()), BoardUtils.isThreatenedBoardImmediate(move2.getBoard()))
+                        .compareTrueFirst(move1.isAttack(), move2.isAttack())
+                        .compareTrueFirst(move1.isCatlingMove(), move2.isCatlingMove())
+                        .compare(move2.getMovedPiece().getPieceValue(), move1.getMovedPiece().getPieceValue())
+                        .result();
+            }
+        };		
+		
+        abstract Collection<Move> sort(Collection<Move> moves);
 	}
 	
 	@Override

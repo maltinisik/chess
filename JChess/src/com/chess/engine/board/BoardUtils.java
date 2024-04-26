@@ -98,4 +98,8 @@ public class BoardUtils {
 		return column;
 	}
 
+	public static boolean isThreatenedBoardImmediate(Board board) {
+		 return board.getWhitePlayer().isInCheck() || board.getBlackPlayer().isInCheck();
+	}
+
 }
