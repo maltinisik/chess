@@ -14,10 +14,12 @@ public class MiniMax implements MoveStrategy {
 
 	private final BoardEvaluator boardEvaluator;
     private final int searchDepth;
+    private final MoveSorter moveSorter;
 	
 	public MiniMax(final int searchDepth) {
 		this.boardEvaluator= StandartBoardEvaluator.get();
 		this.searchDepth=searchDepth;
+		this.moveSorter=MoveSorter.SORT;
 	}
 	
 	@Override
@@ -55,7 +57,7 @@ public class MiniMax implements MoveStrategy {
 		int lowestValue = Integer.MAX_VALUE;
 		int highestValue = Integer.MIN_VALUE;
 		int currentValue;
-        for(final Move move : board.getCurrentPlayer().getLegalMoves()) {
+        for(final Move move : this.moveSorter.sort(board.getCurrentPlayer().getLegalMoves())) {
           final MoveTransition moveTransition = board.getCurrentPlayer().makeMove(move);
           if (moveTransition.getMoveStatus().isDone()) {
         	  
@@ -83,7 +85,7 @@ public class MiniMax implements MoveStrategy {
         
         if (maximizingPlayer) {
             int maxEval = Integer.MIN_VALUE;
-            for (Move move : board.getCurrentPlayer().getLegalMoves()) {
+            for (Move move : this.moveSorter.sort(board.getCurrentPlayer().getLegalMoves())) {
    		        final MoveTransition moveTransition = board.getCurrentPlayer().makeMove(move);
                 int eval = minimaxAlphaBeta(moveTransition.getTransitionBoard(), depth - 1, alpha, beta, false);
                 maxEval = Math.max(maxEval, eval);
